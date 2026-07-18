@@ -8,7 +8,7 @@ import MapDashboard from './pages/MapDashboard'
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-fog">
+    <div className="min-h-screen bg-cream pt-24">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
