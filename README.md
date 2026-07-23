@@ -104,6 +104,15 @@ prefixes throughout every page — grids, navigation, forms, and the vibe
 picker all reflow cleanly at each size, with a dedicated mobile navigation
 bar for small screens.
 
+## Design
+
+The interface uses a custom ocean-inspired color palette (deep teal,
+navy, and gold) with a glassmorphic UI style — translucent, blurred
+panels layered over an animated gradient hero on the Home page. The vibe
+picker cards respond to cursor movement with a real-time 3D tilt effect
+(perspective transforms based on mouse position), adding a tactile,
+interactive feel to the trip-builder form beyond static hover states.
+
 ## User Authentication and Data Persistence
 
 - Implemented with **Firebase Authentication**, supporting both
