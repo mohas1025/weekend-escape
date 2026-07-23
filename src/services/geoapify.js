@@ -9,16 +9,24 @@ export async function getNearbyAttractions(
   lon,
   radiusMeters = 5000,
   limit = 20,
+  categories = "tourism.attraction",
 ) {
-  const url = `${BASE_URL}?categories=tourism.attraction&filter=circle:${lon},${lat},${radiusMeters}&limit=${limit}&apiKey=${API_KEY}`;
+  const url = `${BASE_URL}?categories=${categories}&filter=circle:${lon},${lat},${radiusMeters}&bias=proximity:${lon},${lat}&limit=${limit}&apiKey=${API_KEY}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch attractions");
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const body = await res.json();
+      detail = body?.message || body?.error || JSON.stringify(body);
+    } catch {
+      detail = res.statusText;
+    }
+    throw new Error(`Failed to fetch attractions (${res.status}): ${detail}`);
+  }
   const data = await res.json();
   return data.features;
 }
 
-// Turns a free-text place name ("Austin, TX", "Griffith Park") into
-// coordinates, so the user can search anywhere, not just a fixed city.
 export async function geocodeLocation(query) {
   const url = `${GEOCODE_URL}?text=${encodeURIComponent(query)}&limit=1&apiKey=${API_KEY}`;
   const res = await fetch(url);

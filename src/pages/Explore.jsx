@@ -10,6 +10,30 @@ const DEFAULT_LON = -118.2437;
 const DEFAULT_LABEL = "Los Angeles, CA";
 const MILES_TO_METERS = 1609.34;
 
+// Each vibe maps to different Geoapify categories, so switching vibes
+// actually changes what's returned instead of always querying the same
+// generic "tourism.attraction" bucket.
+const VIBE_CATEGORIES = {
+  adventure: "natural,leisure.park,tourism.attraction.viewpoint",
+  chill: "leisure.park,natural.water,catering.cafe,beach",
+  foodie: "catering.restaurant,catering.cafe,catering.fast_food,catering.bar",
+  scenic: "tourism.attraction.viewpoint,natural,tourism.sights,beach",
+};
+
+// Haversine distance in miles — used to sort results and as a fallback
+// in case the API's own proximity ranking doesn't fully order them.
+function distanceMiles(lat1, lon1, lat2, lon2) {
+  const R = 3958.8;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 export default function Explore() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -31,6 +55,7 @@ export default function Explore() {
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
 
+  // Fetch attractions whenever the search center, radius, or vibe changes.
   useEffect(() => {
     let cancelled = false;
 
@@ -39,11 +64,13 @@ export default function Explore() {
       setError(null);
       try {
         const radiusMeters = Math.round(radiusMiles * MILES_TO_METERS);
+        const categories = VIBE_CATEGORIES[vibe] || VIBE_CATEGORIES.adventure;
         const features = await getNearbyAttractions(
           center.lat,
           center.lon,
           radiusMeters,
-          20,
+          12,
+          categories,
         );
 
         const named = features.filter((f) => f.properties?.name);
@@ -66,10 +93,19 @@ export default function Explore() {
               ),
               lat: f.properties.lat,
               lon: f.properties.lon,
+              distance: distanceMiles(
+                center.lat,
+                center.lon,
+                f.properties.lat,
+                f.properties.lon,
+              ),
               photo,
             };
           }),
         );
+
+        // Sort nearest-first so results have a clear, consistent order.
+        withPhotos.sort((a, b) => a.distance - b.distance);
 
         if (!cancelled) {
           setAttractions(withPhotos);
@@ -87,8 +123,9 @@ export default function Explore() {
     return () => {
       cancelled = true;
     };
-  }, [center, radiusMiles]);
+  }, [center, radiusMiles, vibe]);
 
+  // Real-time filter — filters what's already loaded, no reload.
   const filtered = useMemo(() => {
     if (!query.trim()) return attractions;
     const q = query.toLowerCase();
@@ -123,6 +160,7 @@ export default function Explore() {
       />
 
       <div className="mx-auto max-w-6xl px-6 py-12">
+        {/* Location search — actually re-fetches from a new place */}
         <form
           onSubmit={handleLocationSearch}
           className="mx-auto flex max-w-md gap-2"
@@ -148,6 +186,7 @@ export default function Explore() {
           </p>
         )}
 
+        {/* Instant filter — narrows what's already loaded */}
         <div className="mx-auto mt-4 max-w-md">
           <input
             type="text"
