@@ -1,22 +1,40 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import VibeStamp from '../components/VibeStamp'
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import VibeStamp from "../components/VibeStamp";
+import { useAuth } from "../context/AuthContext";
+import { getUserSettings } from "../services/trips";
 
 const VIBES = [
-  { id: 'adventure', label: 'Adventure', tagline: 'Trails & lookouts', icon: '⛰️' },
-  { id: 'chill', label: 'Chill', tagline: 'Slow mornings', icon: '🌾' },
-  { id: 'foodie', label: 'Foodie', tagline: 'Worth the drive', icon: '🍽️' },
-  { id: 'scenic', label: 'Scenic', tagline: 'Windows down', icon: '📷' },
-]
+  {
+    id: "adventure",
+    label: "Adventure",
+    tagline: "Trails & lookouts",
+    icon: "⛰️",
+  },
+  { id: "chill", label: "Chill", tagline: "Slow mornings", icon: "🌾" },
+  { id: "foodie", label: "Foodie", tagline: "Worth the drive", icon: "🍽️" },
+  { id: "scenic", label: "Scenic", tagline: "Windows down", icon: "📷" },
+];
 
 export default function Home() {
-  const [vibe, setVibe] = useState('adventure')
-  const [radius, setRadius] = useState(45)
-  const navigate = useNavigate()
+  const [vibe, setVibe] = useState("adventure");
+  const [radius, setRadius] = useState(45);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // If the user is signed in, pre-fill the picker with their saved
+  // defaults from My Trips → Settings instead of the hardcoded ones.
+  useEffect(() => {
+    if (!user) return;
+    getUserSettings(user.uid).then((settings) => {
+      if (settings.defaultVibe) setVibe(settings.defaultVibe);
+      if (settings.defaultRadius) setRadius(settings.defaultRadius);
+    });
+  }, [user]);
 
   function handleSubmit(e) {
-    e.preventDefault()
-    navigate(`/explore?vibe=${vibe}&radius=${radius}`)
+    e.preventDefault();
+    navigate(`/explore?vibe=${vibe}&radius=${radius}`);
   }
 
   return (
@@ -26,15 +44,15 @@ export default function Home() {
         {/* floating glass orbs for depth */}
         <div
           className="orb orb-float-a h-72 w-72 bg-cyan/40"
-          style={{ top: '10%', left: '8%' }}
+          style={{ top: "10%", left: "8%" }}
         />
         <div
           className="orb orb-float-b h-96 w-96 bg-sunset/30"
-          style={{ bottom: '5%', right: '5%' }}
+          style={{ bottom: "5%", right: "5%" }}
         />
         <div
           className="orb orb-float-a h-56 w-56 bg-magenta/30"
-          style={{ top: '40%', right: '15%' }}
+          style={{ top: "40%", right: "15%" }}
         />
 
         <div className="relative mx-auto max-w-4xl px-6 pb-14 pt-20 text-center sm:pt-28">
@@ -67,7 +85,7 @@ export default function Home() {
               </h2>
               <div
                 className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4"
-                style={{ perspective: '1000px' }}
+                style={{ perspective: "1000px" }}
               >
                 {VIBES.map((v) => (
                   <VibeStamp
@@ -122,22 +140,22 @@ export default function Home() {
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-6 sm:grid-cols-3">
           {[
             {
-              n: '01',
-              title: 'Set your radius',
+              n: "01",
+              title: "Set your radius",
               body: "Tell us your vibe and how far you'll drive — no itinerary building required.",
-              grad: 'from-cyan to-cyan-dark',
+              grad: "from-cyan to-cyan-dark",
             },
             {
-              n: '02',
-              title: 'Browse real spots',
-              body: 'Live attraction data, weather, and photos for every destination nearby.',
-              grad: 'from-magenta to-violet',
+              n: "02",
+              title: "Browse real spots",
+              body: "Live attraction data, weather, and photos for every destination nearby.",
+              grad: "from-magenta to-violet",
             },
             {
-              n: '03',
-              title: 'Save & revisit',
+              n: "03",
+              title: "Save & revisit",
               body: "Sign in to save trips and pick up right where you left off next time.",
-              grad: 'from-sunset to-magenta',
+              grad: "from-sunset to-magenta",
             },
           ].map((step) => (
             <div
@@ -158,5 +176,5 @@ export default function Home() {
         </div>
       </section>
     </main>
-  )
+  );
 }

@@ -1,20 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
   /* base */
-  --color-ink: #0B1F2D;
-  --color-cream: #F1FAFA;
+  --color-ink: #0b1f2d;
+  --color-cream: #f1fafa;
 
   /* ocean gradient family */
-  --color-violet: #073B4C;
-  --color-magenta: #0E7C86;
-  --color-sunset: #E9C46A;
-  --color-cyan: #48CAE4;
-  --color-cyan-dark: #0096A6;
+  --color-violet: #073b4c;
+  --color-magenta: #0e7c86;
+  --color-sunset: #e9c46a;
+  --color-cyan: #48cae4;
+  --color-cyan-dark: #0096a6;
 
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Space Grotesk', sans-serif;
+  --font-display: "Fraunces", serif;
+  --font-body: "Space Grotesk", sans-serif;
 }
 
 html {
@@ -38,6 +38,14 @@ body {
   outline-offset: 3px;
 }
 
+/* Text inputs already show a colored border on focus — skip the extra
+   outline ring there so it doesn't look like a mismatched double border. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
 /* ---- Animated sunset gradient (hero background) ---- */
 .aurora-bg {
   background: linear-gradient(
@@ -53,9 +61,15 @@ body {
 }
 
 @keyframes aurora-move {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* ---- Floating glass orbs ---- */
@@ -68,17 +82,31 @@ body {
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(20px, -30px) scale(1.08); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -30px) scale(1.08);
+  }
 }
 
 @keyframes float-slower {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-30px, 20px) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-30px, 20px) scale(0.95);
+  }
 }
 
-.orb-float-a { animation: float-slow 9s ease-in-out infinite; }
-.orb-float-b { animation: float-slower 12s ease-in-out infinite; }
+.orb-float-a {
+  animation: float-slow 9s ease-in-out infinite;
+}
+.orb-float-b {
+  animation: float-slower 12s ease-in-out infinite;
+}
 
 /* ---- Glassmorphism (blur + border only — set your own bg-*) ---- */
 .glass {
@@ -88,7 +116,7 @@ body {
 }
 
 /* ---- Custom range slider ---- */
-input[type='range'].glow-slider {
+input[type="range"].glow-slider {
   -webkit-appearance: none;
   appearance: none;
   height: 8px;
@@ -97,7 +125,7 @@ input[type='range'].glow-slider {
   outline: none;
 }
 
-input[type='range'].glow-slider::-webkit-slider-thumb {
+input[type="range"].glow-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 26px;
@@ -105,16 +133,18 @@ input[type='range'].glow-slider::-webkit-slider-thumb {
   border-radius: 9999px;
   background: white;
   border: 4px solid var(--color-magenta);
-  box-shadow: 0 0 0 6px rgba(214, 51, 108, 0.25), 0 4px 14px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 0 0 6px rgba(214, 51, 108, 0.25),
+    0 4px 14px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
 
-input[type='range'].glow-slider::-webkit-slider-thumb:hover {
+input[type="range"].glow-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
 }
 
-input[type='range'].glow-slider::-moz-range-thumb {
+input[type="range"].glow-slider::-moz-range-thumb {
   width: 26px;
   height: 26px;
   border-radius: 9999px;
@@ -125,7 +155,9 @@ input[type='range'].glow-slider::-moz-range-thumb {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora-bg, .orb-float-a, .orb-float-b {
+  .aurora-bg,
+  .orb-float-a,
+  .orb-float-b {
     animation: none;
   }
 }

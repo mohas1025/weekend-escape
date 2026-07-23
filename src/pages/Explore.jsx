@@ -20,6 +20,20 @@ const VIBE_CATEGORIES = {
   scenic: "tourism.attraction.viewpoint,natural,tourism.sights,beach",
 };
 
+// Geoapify returns many categories per place (broad + specific), often
+// with generic ones like "commercial" or "building" listed first. Prefer
+// whichever category actually matches what this vibe searched for, so the
+// label reflects why the place showed up (e.g. "restaurant" for Foodie).
+function pickDisplayCategory(categories, vibe) {
+  if (!categories?.length) return "attraction";
+  const searched = (VIBE_CATEGORIES[vibe] || "").split(",");
+  const match = categories.find((c) =>
+    searched.some((s) => c === s || c.startsWith(s + ".")),
+  );
+  const specific = categories.find((c) => c.includes("."));
+  return match || specific || categories[0];
+}
+
 // Haversine distance in miles — used to sort results and as a fallback
 // in case the API's own proximity ranking doesn't fully order them.
 function distanceMiles(lat1, lon1, lat2, lon2) {
@@ -87,10 +101,11 @@ export default function Explore() {
             return {
               id: f.properties.place_id || f.properties.xid || name,
               name,
-              category: (f.properties.categories?.[0] || "attraction").replace(
-                /[._]/g,
-                " ",
-              ),
+              category: pickDisplayCategory(
+                f.properties.categories,
+                vibe,
+              ).replace(/[._]/g, " "),
+
               lat: f.properties.lat,
               lon: f.properties.lon,
               distance: distanceMiles(
@@ -223,7 +238,9 @@ export default function Explore() {
               <AttractionCard
                 key={a.id}
                 attraction={a}
-                onClick={() => navigate(`/attraction/${a.id}`, { state: a })}
+                onClick={() =>
+                  navigate(`/attraction/${a.id}`, { state: { ...a, vibe } })
+                }
               />
             ))}
           </div>
